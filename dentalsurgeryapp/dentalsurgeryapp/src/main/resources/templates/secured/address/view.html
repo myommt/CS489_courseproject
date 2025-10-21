@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Address Details</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="text-secondary"><i class="fas fa-eye"></i> Address Details</h1>
+                <div class="btn-group">
+                    <a th:href="@{/secured/address/edit/{id}(id=${address.addressId})}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i> Edit</a>
+                    <a href="/secured/address/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Street</dt>
+                        <dd class="col-sm-9" th:text="${address.street}">123 Main St</dd>
+                        <dt class="col-sm-3">City</dt>
+                        <dd class="col-sm-9" th:text="${address.city}">Fairfield</dd>
+                        <dt class="col-sm-3">State</dt>
+                        <dd class="col-sm-9" th:text="${address.state}">IA</dd>
+                        <dt class="col-sm-3">ZIP</dt>
+                        <dd class="col-sm-9" th:text="${address.zipcode}">52557</dd>
+                    </dl>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <a href="/secured/address/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                    <a th:href="@{/secured/address/edit/{id}(id=${address.addressId})}" class="btn btn-primary"><i
+                            class="fas fa-edit"></i> Edit</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteAddressModal"
+                        th:attr="data-entity-id=${address.addressId}, data-entity-name=${address.street + ', ' + address.city}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteAddressModal" tabindex="-1" aria-labelledby="deleteAddressModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title" id="deleteAddressModalLabel">Confirm Delete</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0">Are you sure you want to delete address <strong
+                                    id="deleteAddressEntityName">this address</strong>?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form id="deleteAddressForm" method="post"
+                                th:action="@{'/secured/address/delete/' + ${address.addressId}}">
+                                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+        <script th:inline="javascript">
+            (function () {
+                var modal = document.getElementById('deleteAddressModal');
+                if (!modal) return;
+                modal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    if (!button) return;
+                    var id = button.getAttribute('data-entity-id');
+                    var name = button.getAttribute('data-entity-name') || 'this address';
+                    var form = document.getElementById('deleteAddressForm');
+                    var nameEl = document.getElementById('deleteAddressEntityName');
+                    if (nameEl) nameEl.textContent = name;
+                    if (form && id) {
+                        var target = '/secured/address/delete/' + id;
+                        form.setAttribute('action', window.location.origin + target);
+                    }
+                });
+                var form = document.getElementById('deleteAddressForm');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        var action = form.getAttribute('action');
+                        if (!action || !/\/secured\/address\/delete\/\d+$/.test(action)) {
+                            e.preventDefault();
+                        }
+                    });
+                }
+            })();
+        </script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title th:text="${pageTitle != null ? pageTitle : 'Surgery Locations'}">Surgery Locations</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <main class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary">
+                <i class="fas fa-map-marker-alt"></i> Surgery Locations
+            </h1>
+            <div>
+                <a class="btn btn-outline-primary" href="/secured/location/search">
+                    <i class="fas fa-search"></i> Search
+                </a>
+                <a class="btn btn-success" href="/secured/location/new">
+                    <i class="fas fa-plus"></i> New Location
+                </a>
+                <a href="/secured/index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Address</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="loc : ${locations}">
+                        <td><span class="badge bg-secondary" th:text="${loc.surgeryLocationId}">1</span></td>
+                        <td th:text="${loc.name}">Downtown Clinic</td>
+                        <td>
+                            <a th:href="${'tel:' + loc.contactNumber}" th:text="${loc.contactNumber}">(641) 555-1234</a>
+                        </td>
+                        <td>
+                            <span th:if="${loc.location != null}"
+                                th:text="${loc.location.street + ', ' + loc.location.city + ', ' + loc.location.state + ' ' + loc.location.zipcode}">123
+                                Main St, Fairfield, IA 52557</span>
+                            <span th:if="${loc.location == null}" class="text-muted">No address on file</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a class="btn btn-sm btn-outline-info"
+                                    th:href="@{'/secured/location/view/' + ${loc.surgeryLocationId}}" title="View"
+                                    aria-disabled="true"><i class="fas fa-eye"></i></a>
+                                <a class="btn btn-sm btn-outline-primary"
+                                    th:href="@{'/secured/location/edit/' + ${loc.surgeryLocationId}}" title="Edit"
+                                    aria-disabled="true"><i class="fas fa-edit"></i></a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteLocationModal"
+                                    th:attr="data-entity-id=${loc.surgeryLocationId}, data-entity-name=${loc.name}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteLocationModal" tabindex="-1" aria-labelledby="deleteLocationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteLocationModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to delete location <strong id="deleteLocationEntityName">this
+                            location</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteLocationForm" method="post">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script th:inline="javascript">
+        (function () {
+            var modal = document.getElementById('deleteLocationModal');
+            if (!modal) return;
+            modal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if (!button) return;
+                var id = button.getAttribute('data-entity-id');
+                var name = button.getAttribute('data-entity-name') || 'this location';
+                var form = document.getElementById('deleteLocationForm');
+                var nameEl = document.getElementById('deleteLocationEntityName');
+                if (nameEl) nameEl.textContent = name;
+                if (form && id) {
+                    var target = '/secured/location/delete/' + id;
+                    form.setAttribute('action', window.location.origin + target);
+                }
+            });
+            var form = document.getElementById('deleteLocationForm');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    var action = form.getAttribute('action');
+                    if (!action || !/\/secured\/location\/delete\/\d+$/.test(action)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

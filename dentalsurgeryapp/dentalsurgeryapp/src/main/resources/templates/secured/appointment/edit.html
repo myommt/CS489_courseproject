@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title th:text="${pageTitle != null ? pageTitle : 'Edit Appointment'}">Edit Appointment</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <h2>Edit Appointment</h2>
+
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <!-- Guard: if no ID, show friendly message and back link -->
+        <div th:if="${appointment == null or appointment.appointmentId == null}" class="alert alert-danger">
+            Invalid appointment id.
+            <a class="alert-link" th:href="@{/secured/appointment/list}">Back to list</a>
+        </div>
+
+        <form th:if="${appointment != null and appointment.appointmentId != null}"
+            th:action="@{/secured/appointment/edit/{id}(id=${appointment.appointmentId})}" method="post"
+            th:object="${appointment}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="appointmentType" class="form-label">Type <span class="text-danger">*</span></label>
+                    <input id="appointmentType" type="text" class="form-control" th:field="*{appointmentType}"
+                        required />
+                </div>
+                <div class="col-md-4">
+                    <label for="appointmentStatus" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select id="appointmentStatus" class="form-select" th:field="*{appointmentStatus}" required
+                        onchange="handleStatusChange(this.value)">
+                        <option value="">Select status</option>
+                        <option value="SCHEDULED">SCHEDULED</option>
+                        <option value="CONFIRMED">CONFIRMED</option>
+                        <option value="CHECKIN">CHECKIN</option>
+                        <option value="CHECKOUT">CHECKOUT</option>
+                        <option value="CANCELLED">CANCELLED</option>
+                        <option value="COMPLETED">COMPLETED</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="appointmentDateTime" class="form-label">Date/Time <span
+                            class="text-danger">*</span></label>
+                    <input id="appointmentDateTime" type="datetime-local" class="form-control"
+                        th:field="*{appointmentDateTime}" required onchange="validateAppointmentDateTime(this)" />
+                    <div class="invalid-feedback" id="dateTimeError">
+                        Invalid appointment time
+                    </div>
+                    <small class="text-muted">
+                        Business Hours: Mon-Fri 8AM-6PM, Sat 9AM-3PM, Sun Closed
+                    </small>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <label for="patientId" class="form-label">Patient <span class="text-danger">*</span></label>
+                    <select id="patientId" class="form-select" name="patientId" required>
+                        <option value="" disabled>Select patient</option>
+                        <option th:each="p : ${patients}" th:value="${p.patientId}"
+                            th:selected="${appointment.patient != null and p.patientId == appointment.patient.patientId}"
+                            th:text="${p.firstName + ' ' + p.lastName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="dentistId" class="form-label">Dentist <span class="text-danger">*</span></label>
+                    <select id="dentistId" class="form-select" name="dentistId" required>
+                        <option value="" disabled>Select dentist</option>
+                        <option th:each="d : ${dentists}" th:value="${d.dentistId}"
+                            th:selected="${appointment.dentist != null and d.dentistId == appointment.dentist.dentistId}"
+                            th:text="${d.firstName + ' ' + d.lastName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="surgeryLocationId" class="form-label">Location <span
+                            class="text-danger">*</span></label>
+                    <select id="surgeryLocationId" class="form-select" name="surgeryLocationId" required>
+                        <option value="" disabled>Select location</option>
+                        <option th:each="s : ${surgeryLocations}" th:value="${s.surgeryLocationId}"
+                            th:selected="${appointment.surgeryLocation != null and s.surgeryLocationId == appointment.surgeryLocation.surgeryLocationId}"
+                            th:text="${s.name}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Billing Section (shown only when status is CHECKOUT) -->
+            <div id="billingSection" class="mt-4" style="display: none;">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> Billing Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="totalCost" class="form-label">Total Cost <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input id="totalCost" type="number" class="form-control" name="totalCost"
+                                        step="0.01" min="0" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="paymentStatus" class="form-label">Payment Status <span
+                                        class="text-danger">*</span></label>
+                                <select id="paymentStatus" class="form-select" name="paymentStatus">
+                                    <option value="PENDING" selected>PENDING</option>
+                                    <option value="PAID">PAID</option>
+                                    <option value="OVERDUE">OVERDUE</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i> A bill will be created and linked to this appointment
+                            when you save with CHECKOUT status.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-secondary" th:href="@{/secured/appointment/list}">Cancel</a>
+                <button type="button" class="btn btn-danger ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#deleteAppointmentModal"
+                    th:attr="data-entity-id=${appointment.appointmentId},
+                             data-entity-name=${(appointment.patient != null ? appointment.patient.firstName + ' ' + appointment.patient.lastName : 'this appointment')}">
+                    Delete
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to delete appointment for <strong
+                            id="deleteApptEntityName">this record</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteApptForm" method="post"
+                        th:if="${appointment != null and appointment.appointmentId != null}"
+                        th:action="@{/secured/appointment/delete/{id}(id=${appointment.appointmentId})}">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        // Validate appointment date/time (future + business hours)
+        function validateAppointmentDateTime(input) {
+            const selectedDateTime = new Date(input.value);
+            const now = new Date();
+            const errorDiv = document.getElementById('dateTimeError');
+
+            // Check if date is in the future
+            if (selectedDateTime <= now) {
+                input.classList.add('is-invalid');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Appointment date/time must be in the future';
+                    errorDiv.style.display = 'block';
+                }
+                return false;
+            }
+
+            // Get day of week (0 = Sunday, 6 = Saturday)
+            const dayOfWeek = selectedDateTime.getDay();
+            const hours = selectedDateTime.getHours();
+            const minutes = selectedDateTime.getMinutes();
+
+            // Check if Sunday (closed)
+            if (dayOfWeek === 0) {
+                input.classList.add('is-invalid');
+                if (errorDiv) {
+                    errorDiv.textContent = 'We are closed on Sundays';
+                    errorDiv.style.display = 'block';
+                }
+                return false;
+            }
+
+            // Check if Saturday (9 AM - 3 PM)
+            if (dayOfWeek === 6) {
+                if (hours < 9 || hours >= 15) {
+                    input.classList.add('is-invalid');
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Saturday hours: 9:00 AM - 3:00 PM';
+                        errorDiv.style.display = 'block';
+                    }
+                    return false;
+                }
+            }
+
+            // Check Monday-Friday (8 AM - 6 PM)
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                if (hours < 8 || hours >= 18) {
+                    input.classList.add('is-invalid');
+                    if (errorDiv) {
+                        errorDiv.textContent = 'Monday-Friday hours: 8:00 AM - 6:00 PM';
+                        errorDiv.style.display = 'block';
+                    }
+                    return false;
+                }
+            }
+
+            // Valid appointment time
+            input.classList.remove('is-invalid');
+            if (errorDiv) errorDiv.style.display = 'none';
+            return true;
+        }
+
+        // Handle status change to show/hide billing section
+        function handleStatusChange(status) {
+            const billingSection = document.getElementById('billingSection');
+            if (status === 'CHECKOUT') {
+                billingSection.style.display = 'block';
+                document.getElementById('totalCost').setAttribute('required', 'required');
+                document.getElementById('paymentStatus').setAttribute('required', 'required');
+            } else {
+                billingSection.style.display = 'none';
+                document.getElementById('totalCost').removeAttribute('required');
+                document.getElementById('paymentStatus').removeAttribute('required');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const statusSelect = document.getElementById('appointmentStatus');
+            if (statusSelect) {
+                handleStatusChange(statusSelect.value);
+            }
+
+            // Validate datetime on form submit
+            const form = document.querySelector('form[th\\:action]');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    const dateTimeInput = document.getElementById('appointmentDateTime');
+                    if (dateTimeInput && !validateAppointmentDateTime(dateTimeInput)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+
+        // Delete modal logic
+        (function () {
+            var modal = document.getElementById('deleteAppointmentModal');
+            if (!modal) return;
+            modal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if (!button) return;
+                var id = button.getAttribute('data-entity-id');
+                var name = button.getAttribute('data-entity-name') || 'this appointment';
+                var form = document.getElementById('deleteApptForm');
+                var nameEl = document.getElementById('deleteApptEntityName');
+                if (nameEl) nameEl.textContent = name;
+                if (form && id) {
+                    var target = '/secured/appointment/delete/' + id;
+                    form.setAttribute('action', window.location.origin + target);
+                }
+            });
+            var form = document.getElementById('deleteApptForm');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    var action = form.getAttribute('action');
+                    if (!action || !/\/secured\/appointment\/delete\/\d+$/.test(action)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

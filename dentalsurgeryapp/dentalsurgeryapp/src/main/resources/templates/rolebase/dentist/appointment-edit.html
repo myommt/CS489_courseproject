@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Edit Appointment - Dental Surgery</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-edit"></i> Edit Appointment
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error Messages -->
+                        <div th:if="${errors}" class="alert alert-danger">
+                            <h6>Please correct the following errors:</h6>
+                            <ul class="mb-0">
+                                <li th:each="error : ${errors}" th:text="${error.defaultMessage}"></li>
+                            </ul>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <form
+                            th:action="@{/dentalsurgeryapp/rolebase/dentist/appointments/{appointmentId}/edit(appointmentId=${appointment.appointmentId})}"
+                            th:object="${appointment}" method="post" novalidate>
+
+                            <!-- Hidden fields -->
+                            <input type="hidden" th:field="*{appointmentId}">
+                            <input type="hidden" th:field="*{patient.patientId}">
+                            <input type="hidden" th:field="*{dentist.dentistId}">
+                            <input type="hidden" th:field="*{surgeryLocation.surgeryLocationId}"
+                                th:if="*{surgeryLocation}">
+                            <input type="hidden" th:field="*{appointmentType}">
+                            <input type="hidden" th:field="*{appointmentDateTime}">
+
+                            <!-- Patient Information (Read-only) -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-user"></i> Patient Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Name:</strong> <span
+                                                    th:text="${appointment.patient.firstName + ' ' + appointment.patient.lastName}"></span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Email:</strong> <span th:text="${appointment.patient.email}"
+                                                    th:if="${appointment.patient.email}"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Appointment Details -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Appointment Type</label>
+                                        <div class="form-control-plaintext bg-light p-2 rounded border">
+                                            <i class="fas fa-calendar-check text-primary"></i>
+                                            <span th:text="*{appointmentType}"></span>
+                                        </div>
+                                        <div class="form-text">Appointment type cannot be changed.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="appointmentStatus" class="form-label">Status *</label>
+                                        <select class="form-select" id="appointmentStatus"
+                                            th:field="*{appointmentStatus}"
+                                            th:classappend="${#fields.hasErrors('appointmentStatus')} ? 'is-invalid' : ''"
+                                            required>
+                                            <option value="CHECKIN">CHECKIN</option>
+                                            <option value="COMPLETED">COMPLETED</option>
+                                        </select>
+                                        <div th:if="${#fields.hasErrors('appointmentStatus')}" class="invalid-feedback"
+                                            th:errors="*{appointmentStatus}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Date & Time</label>
+                                <div class="form-control-plaintext bg-light p-2 rounded border">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    <span
+                                        th:text="${#temporals.format(appointment.appointmentDateTime, 'MMMM dd, yyyy - hh:mm a')}"></span>
+                                </div>
+                                <div class="form-text">Appointment date and time cannot be changed.</div>
+                            </div>
+
+                            <!-- Location Information (Read-only) -->
+                            <div class="card mb-4" th:if="${appointment.surgeryLocation}">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Location</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Location:</strong> <span
+                                            th:text="${appointment.surgeryLocation.name}"></span></p>
+                                    <div th:if="${appointment.surgeryLocation.location}">
+                                        <p><strong>Address:</strong>
+                                            <span th:text="${appointment.surgeryLocation.location.street}"></span>,
+                                            <span th:text="${appointment.surgeryLocation.location.city}"></span>,
+                                            <span th:text="${appointment.surgeryLocation.location.state}"></span>
+                                            <span th:text="${appointment.surgeryLocation.location.zipCode}"></span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Update Appointment
+                                </button>
+                                <a th:href="@{/dentalsurgeryapp/rolebase/dentist/appointments}"
+                                    class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Information Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i> Important Notes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Please Note:</h6>
+                            <ul class="mb-0">
+                                <li>You can only update the appointment status to CHECKIN or COMPLETED</li>
+                                <li>Appointment type and date/time cannot be changed</li>
+                                <li>Changes to appointment status are immediately saved</li>
+                                <li>You can only edit appointments assigned to you</li>
+                                <li>Mark appointments as "COMPLETED" when the patient visit is finished</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

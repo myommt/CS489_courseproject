@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Home</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="hero-section">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 text-primary">
+                            <i class="fas fa-tooth"></i>
+                            Welcome to Our Dental Surgery
+                        </h1>
+                        <p class="lead">
+                            Providing comprehensive dental care with state-of-the-art technology
+                            and compassionate service for over 20 years.
+                        </p>
+                        <div class="mt-4">
+                            <a href="/secured/patient/new" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-calendar-plus"></i> Book Appointment
+                            </a>
+                            <a href="/about" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-info-circle"></i> Learn More
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <img src="/images/dental-surgery.png" alt="Dental Office" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="services-section">
+                <h2 class="text-center mb-5">Our Services</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-teeth fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">General Dentistry</h5>
+                                <p class="card-text">
+                                    Comprehensive dental care including cleanings, fillings,
+                                    and preventive treatments for the whole family.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Oral Surgery</h5>
+                                <p class="card-text">
+                                    Advanced surgical procedures including tooth extractions,
+                                    implants, and corrective jaw surgery.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-smile fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Cosmetic Dentistry</h5>
+                                <p class="card-text">
+                                    Enhance your smile with whitening, veneers, crowns,
+                                    and other aesthetic dental treatments.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-section bg-light p-5 rounded mt-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3><i class="fas fa-phone"></i> Contact Information</h3>
+                        <p><strong>Phone:</strong> (555) 123-4567</p>
+                        <p><strong>Email:</strong> info@dentalsurgery.com</p>
+                        <p><strong>Address:</strong> 123 Dental St, Healthcare City, HC 12345</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h3><i class="fas fa-clock"></i> Office Hours</h3>
+                        <p><strong>Monday - Friday:</strong> 8:00 AM - 6:00 PM</p>
+                        <p><strong>Saturday:</strong> 9:00 AM - 3:00 PM</p>
+                        <p><strong>Sunday:</strong> Closed</p>
+                        <p><strong>Emergency:</strong> 24/7 On-call</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <style>
+        .hero-section {
+            padding: 2rem 0;
+        }
+
+        .services-section {
+            padding: 3rem 0;
+        }
+
+        .card {
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-section {
+            margin-bottom: 2rem;
+        }
+    </style>
+</body>
+
+</html>

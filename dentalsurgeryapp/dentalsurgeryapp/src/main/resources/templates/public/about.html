@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - About Us</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="page-header">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-info-circle"></i> About Our Dental Surgery
+                </h1>
+                <p class="lead">Learn more about our practice, our team, and our commitment to your oral health.</p>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <section class="mb-5">
+                        <h2 class="text-primary">Our Mission</h2>
+                        <p class="fs-5">
+                            At our dental surgery, we are committed to providing exceptional dental care
+                            in a comfortable, modern environment. Our mission is to help our patients
+                            achieve and maintain optimal oral health through comprehensive, personalized
+                            treatment plans.
+                        </p>
+                        <p>
+                            We believe that everyone deserves access to quality dental care, and we
+                            strive to make our services accessible and affordable for patients of all ages.
+                            Our team of experienced professionals uses the latest technology and techniques
+                            to ensure the best possible outcomes for our patients.
+                        </p>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="text-primary">Our History</h2>
+                        <p>
+                            Founded in 2003, our dental practice has been serving the community for over
+                            20 years. What started as a small family practice has grown into a comprehensive
+                            dental surgery offering a full range of services from routine cleanings to
+                            complex oral surgeries.
+                        </p>
+                        <p>
+                            Throughout our history, we have maintained our commitment to patient care,
+                            continuing education, and staying at the forefront of dental technology.
+                            We are proud to have helped thousands of patients achieve healthy, beautiful smiles.
+                        </p>
+                    </section>
+
+                    <section class="mb-5">
+                        <h2 class="text-primary">Our Technology</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Digital X-rays</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> 3D Imaging</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Laser Dentistry</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> CAD/CAM Technology</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Intraoral Cameras</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Digital Impressions</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Sedation Options</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success"></i> Electronic Records</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-award"></i> Our Certifications</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">American Dental Association</li>
+                                <li class="mb-2">Board Certified Oral Surgeons</li>
+                                <li class="mb-2">State Dental Board Licensed</li>
+                                <li class="mb-2">OSHA Compliance Certified</li>
+                                <li class="mb-2">Continuing Education Credits</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-users"></i> Our Team</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Our experienced team includes board-certified dentists,
+                                skilled dental hygienists, and friendly support staff
+                                dedicated to making your visit comfortable and successful.
+                            </p>
+                            <a href="/secured/dentist/list" class="btn btn-success">Meet Our Dentists</a>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-handshake"></i> Patient Promise</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                We promise to treat every patient with respect, provide
+                                clear communication about treatments, and deliver the
+                                highest quality care in a comfortable environment.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section bg-light p-5 rounded mt-5 text-center">
+                <h3>Ready to Experience Quality Dental Care?</h3>
+                <p class="mb-4">Schedule your appointment today and join our family of satisfied patients.</p>
+                <a href="/secured/patient/new" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                </a>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <style>
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .cta-section {
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+    </style>
+</body>
+
+</html>

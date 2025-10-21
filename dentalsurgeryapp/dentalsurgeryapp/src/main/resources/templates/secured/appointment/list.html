@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title th:text="${pageTitle != null ? pageTitle : 'Appointments'}">Appointments</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary">
+                <i class="fas fa-calendar-check"></i> Appointment Management
+            </h1>
+            <div>
+                <a class="btn btn-success" th:href="@{/secured/appointment/new}">
+                    <i class="fa fa-plus"></i> New Appointment
+                </a>
+                <a href="/secured/index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-search"></i> Search Appointments</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="/secured/appointment/list">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="searchTerm"
+                                placeholder="Search by patient name, dentist name, or type...">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Date/Time</th>
+                        <th>Patient</th>
+                        <th>Dentist</th>
+                        <th>Location</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="appt : ${appointments}">
+                        <td th:text="${appt.appointmentId}">1</td>
+                        <td th:text="${appt.appointmentType}">Checkup</td>
+                        <td th:text="${appt.appointmentStatus}">Scheduled</td>
+                        <td th:text="${#temporals.format(appt.appointmentDateTime, 'yyyy-MM-dd HH:mm')}">2025-01-01
+                            09:00</td>
+                        <td
+                            th:text="${appt.patient != null ? appt.patient.firstName + ' ' + appt.patient.lastName : ''}">
+                            John Doe</td>
+                        <td
+                            th:text="${appt.dentist != null ? appt.dentist.firstName + ' ' + appt.dentist.lastName : ''}">
+                            Dr. Smith</td>
+                        <td th:text="${appt.surgeryLocation != null ? appt.surgeryLocation.name : ''}">Room 1</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" th:if="${appt.appointmentId != null}"
+                                th:href="@{/secured/appointment/view/{id}(id=${appt.appointmentId})}">View</a>
+                            <button class="btn btn-sm btn-outline-secondary" th:if="${appt.appointmentId == null}"
+                                disabled title="No ID">
+                                View
+                            </button>
+                            <a class="btn btn-sm btn-outline-primary" th:if="${appt.appointmentId != null}"
+                                th:href="@{/secured/appointment/edit/{id}(id=${appt.appointmentId})}">Edit</a>
+                            <button class="btn btn-sm btn-outline-primary" th:if="${appt.appointmentId == null}"
+                                disabled title="No ID">
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteAppointmentModal"
+                                th:attr="data-entity-id=${appt.appointmentId},
+                                         data-entity-name=${(appt.patient != null ? appt.patient.firstName + ' ' + appt.patient.lastName : 'Appointment')}">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to delete appointment for <strong
+                            id="deleteApptEntityName">this record</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteApptForm" method="post">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        (function () {
+            var modal = document.getElementById('deleteAppointmentModal');
+            if (!modal) return;
+            modal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if (!button) return;
+                var id = button.getAttribute('data-entity-id');
+                var name = button.getAttribute('data-entity-name') || 'this appointment';
+                var form = document.getElementById('deleteApptForm');
+                var nameEl = document.getElementById('deleteApptEntityName');
+                if (nameEl) nameEl.textContent = name;
+                if (form && id) {
+                    var target = '/secured/appointment/delete/' + id;
+                    form.setAttribute('action', window.location.origin + target);
+                }
+            });
+            var form = document.getElementById('deleteApptForm');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    var action = form.getAttribute('action');
+                    if (!action || !/\/secured\/appointment\/delete\/\d+$/.test(action)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

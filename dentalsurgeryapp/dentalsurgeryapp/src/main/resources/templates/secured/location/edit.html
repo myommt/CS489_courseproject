@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Edit Location</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <h1 class="text-secondary"><i class="fas fa-edit"></i> Edit Location</h1>
+            <form th:action="@{|/secured/location/edit/${location.surgeryLocationId}|}" th:object="${location}"
+                method="post" class="mt-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input id="name" type="text" class="form-control" th:field="*{name}" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="contactNumber" class="form-label">Contact</label>
+                        <input id="contactNumber" type="text" class="form-control" th:field="*{contactNumber}" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label for="street" class="form-label">Street</label>
+                        <input id="street" type="text" class="form-control" th:field="*{location.street}" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">City</label>
+                        <input id="city" type="text" class="form-control" th:field="*{location.city}" />
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label for="state" class="form-label">State</label>
+                        <input id="state" type="text" class="form-control" th:field="*{location.state}" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="zipcode" class="form-label">Zipcode</label>
+                        <input id="zipcode" type="text" class="form-control" th:field="*{location.zipcode}" />
+                    </div>
+                </div>
+
+                <div class="mt-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                    <a href="/secured/location/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i>
+                        Cancel</a>
+                </div>
+            </form>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</body>
+
+</html>

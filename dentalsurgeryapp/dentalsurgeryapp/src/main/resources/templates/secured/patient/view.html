@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Patient Details</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-primary">
+                    <i class="fas fa-user"></i> Patient Details
+                    <small class="text-muted" th:if="${patient != null}" th:text="'ID: ' + ${patient.patientId}">
+                        ID: 1
+                    </small>
+                </h1>
+                <div>
+                    <a th:href="@{/secured/patient/edit/{id}(id=${patient?.patientId})}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit"></i> Edit Patient
+                    </a>
+                    <a href="/secured/patient/list" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+
+            <div class="row" th:if="${patient != null}">
+                <!-- Patient Information Card -->
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user"></i> Personal Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Full Name</h6>
+                                    <p class="lead" th:text="${patient.firstName + ' ' + patient.lastName}">John Doe</p>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Date of Birth</h6>
+                                    <p th:text="${patient.dob}">1990-01-01</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Age</h6>
+                                    <p
+                                        th:text="${patient.dob != null ? T(java.time.Period).between(patient.dob, T(java.time.LocalDate).now()).years + ' years' : 'N/A'}">
+                                        30 years</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Card -->
+                    <div class="card shadow mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-phone"></i> Contact Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Phone Number</h6>
+                                    <p th:if="${patient.contactNumber != null and !patient.contactNumber.empty}">
+                                        <i class="fas fa-phone text-primary"></i>
+                                        <a th:href="'tel:' + ${patient.contactNumber}"
+                                            th:text="${patient.contactNumber}">555-0123</a>
+                                    </p>
+                                    <p th:if="${patient.contactNumber == null or patient.contactNumber.empty}"
+                                        class="text-muted">
+                                        <i class="fas fa-phone text-muted"></i> Not provided
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Email Address</h6>
+                                    <p th:if="${patient.email != null and !patient.email.empty}">
+                                        <i class="fas fa-envelope text-primary"></i>
+                                        <a th:href="'mailto:' + ${patient.email}"
+                                            th:text="${patient.email}">john@example.com</a>
+                                    </p>
+                                    <p th:if="${patient.email == null or patient.email.empty}" class="text-muted">
+                                        <i class="fas fa-envelope text-muted"></i> Not provided
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Information Card -->
+                    <div class="card shadow mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-home"></i> Address Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${patient.address != null}">
+                                <h6>Current Address</h6>
+                                <address>
+                                    <span th:text="${patient.address.street}">123 Main Street</span><br>
+                                    <span
+                                        th:text="${patient.address.city + ', ' + patient.address.state + ' ' + patient.address.zipcode}">City,
+                                        State 12345</span>
+                                </address>
+                            </div>
+                            <div th:if="${patient.address == null}" class="text-muted">
+                                <i class="fas fa-home"></i> No address information available
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Panel -->
+                <div class="col-lg-4">
+                    <!-- Quick Actions Card -->
+                    <div class="card shadow">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-lightning-bolt"></i> Quick Actions
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/secured/patient/edit/{id}(id=${patient.patientId})}"
+                                    class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Edit Patient
+                                </a>
+                                <a href="#" class="btn btn-outline-success">
+                                    <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                                </a>
+                                <a href="#" class="btn btn-outline-info">
+                                    <i class="fas fa-file-medical"></i> Medical History
+                                </a>
+                                <a href="#" class="btn btn-outline-secondary">
+                                    <i class="fas fa-file-invoice"></i> Billing History
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patient Statistics Card -->
+                    <div class="card shadow mt-4">
+                        <div class="card-header bg-dark text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-bar"></i> Patient Statistics
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <h4 class="text-primary">0</h4>
+                                    <small class="text-muted">Total Visits</small>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h4 class="text-success">0</h4>
+                                    <small class="text-muted">Upcoming</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-info">$0.00</h4>
+                                    <small class="text-muted">Outstanding</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-warning">0</h4>
+                                    <small class="text-muted">Pending Bills</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patient Notes Card -->
+                    <div class="card shadow mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-sticky-note"></i> Notes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">No notes available for this patient.</p>
+                            <a href="#" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-plus"></i> Add Note
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div th:if="${patient == null}" class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Patient not found!</strong>
+                The requested patient could not be found in the system.
+                <br>
+                <a href="/secured/patient/list" class="alert-link">Return to patient list</a>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <style>
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        address {
+            margin-bottom: 0;
+        }
+    </style>
+</body>
+
+</html>

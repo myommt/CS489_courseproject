@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>My Profile - Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user-circle"></i> My Profile</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Success/Error Messages -->
+                            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="@{/dentalsurgeryapp/rolebase/patient/profile/edit}" th:object="${user}"
+                                method="post">
+                                <input type="hidden" th:field="*{userId}" />
+
+                                <!-- Personal Information -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">First Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}"
+                                            th:errors="*{firstName}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">Last Name <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                            th:errors="*{lastName}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="dob" class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="dob" name="dob"
+                                            th:value="${patient.dob}">
+                                    </div>
+                                </div>
+
+                                <!-- Contact Information -->
+                                <h5 class="mt-4 mb-3"><i class="fas fa-phone"></i> Contact Information</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="contactNumber" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="contactNumber" name="contactNumber"
+                                            th:value="${patient.contactNumber}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="username" class="form-label">Username <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="username" th:field="*{username}"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                                            th:errors="*{username}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email <span
+                                                class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="email" th:field="*{email}"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
+                                            th:errors="*{email}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Address Information -->
+                                <h5 class="mt-4 mb-3"><i class="fas fa-map-marker-alt"></i> Address</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="street" class="form-label">Street <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="street" name="street"
+                                            th:value="${patient.address != null ? patient.address.street : ''}"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="city" class="form-label">City <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="city" name="city"
+                                            th:value="${patient.address != null ? patient.address.city : ''}" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="state" class="form-label">State <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="state" name="state"
+                                            th:value="${patient.address != null ? patient.address.state : ''}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="zipcode" class="form-label">Zip Code <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode"
+                                            th:value="${patient.address != null ? patient.address.zipcode : ''}"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                    <a th:href="@{/dentalsurgeryapp/rolebase/patient/dashboard}"
+                                        class="btn btn-outline-secondary me-md-2">
+                                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Update Profile
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</body>
+
+</html>

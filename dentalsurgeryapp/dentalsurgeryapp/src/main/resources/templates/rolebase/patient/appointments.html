@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>My Appointments - Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-5 text-primary">
+                        <i class="fas fa-calendar-alt"></i> My Appointments
+                    </h1>
+                    <p class="lead">Manage your online dental appointments</p>
+                </div>
+                <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Book New Appointment
+                </a>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Filter Options -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="PENDING" th:selected="${param.status == 'PENDING'}">Pending</option>
+                                <option value="CONFIRMED" th:selected="${param.status == 'CONFIRMED'}">Confirmed
+                                </option>
+                                <option value="COMPLETED" th:selected="${param.status == 'COMPLETED'}">Completed
+                                </option>
+                                <option value="CANCELLED" th:selected="${param.status == 'CANCELLED'}">Cancelled
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fromDate" class="form-label">From Date</label>
+                            <input type="date" class="form-control" id="fromDate" name="fromDate"
+                                th:value="${param.fromDate}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="toDate" class="form-label">To Date</label>
+                            <input type="date" class="form-control" id="toDate" name="toDate"
+                                th:value="${param.toDate}">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments}"
+                                class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Appointments List -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Dentist</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${appointments.empty}">
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                                        <br>
+                                        <h5>No appointments found</h5>
+                                        <p>You haven't booked any appointments yet.</p>
+                                        <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments/new}"
+                                            class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Book Your First Appointment
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:each="appointment : ${appointments.content}">
+                                    <td>
+                                        <div>
+                                            <strong
+                                                th:text="${#temporals.format(appointment.appointmentDateTime, 'MMM dd, yyyy')}">Date</strong>
+                                        </div>
+                                        <div class="text-muted small"
+                                            th:text="${#temporals.format(appointment.appointmentDateTime, 'hh:mm a')}">
+                                            Time
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div th:text="${appointment.dentist.fullName}">Dr. Smith</div>
+                                        <div class="text-muted small" th:text="${appointment.dentist.specialization}">
+                                            Specialization</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary" th:text="${appointment.appointmentType}">
+                                            Consultation
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning"
+                                            th:if="${appointment.appointmentStatus == 'PENDING'}">
+                                            <i class="fas fa-clock"></i> Pending
+                                        </span>
+                                        <span class="badge bg-success"
+                                            th:if="${appointment.appointmentStatus == 'CONFIRMED'}">
+                                            <i class="fas fa-check"></i> Confirmed
+                                        </span>
+                                        <span class="badge bg-info"
+                                            th:if="${appointment.appointmentStatus == 'COMPLETED'}">
+                                            <i class="fas fa-check-double"></i> Completed
+                                        </span>
+                                        <span class="badge bg-danger"
+                                            th:if="${appointment.appointmentStatus == 'CANCELLED'}">
+                                            <i class="fas fa-times"></i> Cancelled
+                                        </span>
+                                        <span class="badge bg-secondary"
+                                            th:if="${appointment.appointmentStatus == 'IN_PROGRESS'}">
+                                            <i class="fas fa-spinner"></i> In Progress
+                                        </span>
+                                        <span class="badge bg-dark"
+                                            th:if="${!(appointment.appointmentStatus == 'PENDING' || appointment.appointmentStatus == 'CONFIRMED' || appointment.appointmentStatus == 'COMPLETED' || appointment.appointmentStatus == 'CANCELLED' || appointment.appointmentStatus == 'IN_PROGRESS')}">
+                                            <span th:text="${appointment.appointmentStatus}">Status</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="text-muted text-center">
+                                            <small>-</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments/{id}/edit(id=${appointment.appointmentId})}"
+                                                class="btn btn-outline-primary"
+                                                th:if="${appointment.appointmentStatus == 'PENDING' or appointment.appointmentStatus == 'CONFIRMED'}"
+                                                title="Edit Appointment">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                th:if="${appointment.appointmentStatus == 'PENDING' or appointment.appointmentStatus == 'CONFIRMED'}"
+                                                th:onclick="'cancelAppointment(' + ${appointment.appointmentId} + ')'"
+                                                title="Cancel Appointment">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments/view/{id}(id=${appointment.appointmentId})}"
+                                                class="btn btn-outline-info" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <!-- Cancel Appointment Modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to cancel this appointment?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Appointment</button>
+                    <form id="cancelForm" method="post" style="display: inline;">
+                        <!-- CSRF token for Spring Security -->
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Yes, Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cancelAppointment(appointmentId) {
+            const form = document.getElementById('cancelForm');
+            form.action = '/dentalsurgeryapp/rolebase/patient/appointments/' + appointmentId + '/cancel';
+            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            modal.show();
+        }
+    </script>
+</body>
+
+</html>

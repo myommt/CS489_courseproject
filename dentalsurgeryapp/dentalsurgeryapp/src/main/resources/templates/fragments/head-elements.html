@@ -1,0 +1,18 @@
+<head th:fragment="headElements" xmlns:th="http://www.thymeleaf.org">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dental Surgery Management System">
+    <meta name="author" content="CS489 Student">
+    <link rel="icon" href="/images/dental-favicon.png">
+    <title th:text="${pageTitle != null ? pageTitle : 'Dental Surgery App'}">Dental Surgery App</title>
+    <!-- Bootswatch Minty theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/minty/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom overrides (keep after theme) -->
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>

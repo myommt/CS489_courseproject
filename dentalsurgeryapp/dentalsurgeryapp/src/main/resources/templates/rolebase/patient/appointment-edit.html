@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Edit Appointment - Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>
+                                <i class="fas fa-edit text-warning"></i>
+                                Edit Appointment
+                            </h4>
+                            <p class="mb-0 text-muted">Modify your appointment details</p>
+                        </div>
+                        <div class="card-body">
+                            <!-- Success/Error Messages -->
+                            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <!-- Current Status Alert -->
+                            <div th:if="${appointmentEntity.appointmentStatus == 'CONFIRMED'}"
+                                class="alert alert-success mb-3">
+                                <i class="fas fa-check-circle"></i> This appointment is confirmed
+                            </div>
+                            <div th:if="${appointmentEntity.appointmentStatus == 'PENDING'}"
+                                class="alert alert-warning mb-3">
+                                <i class="fas fa-clock"></i> This appointment is pending confirmation
+                            </div>
+                            <div th:if="${appointmentEntity.appointmentStatus == 'CANCELLED'}"
+                                class="alert alert-danger mb-3">
+                                <i class="fas fa-times-circle"></i> This appointment is cancelled
+                            </div>
+
+                            <form
+                                th:action="@{'/dentalsurgeryapp/rolebase/patient/appointments/' + ${appointment.appointmentId} + '/edit'}"
+                                th:object="${appointment}" method="post">
+                                <input type="hidden" th:field="*{appointmentId}" />
+                                <input type="hidden" th:field="*{patient}" />
+
+                                <!-- Appointment Type (Fixed as Online) -->
+                                <div class="mb-3">
+                                    <label for="appointmentTypeDisplay" class="form-label">Appointment Type</label>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-video"></i> Online Consultation
+                                        <small class="d-block">All appointments are conducted via secure video
+                                            call</small>
+                                    </div>
+                                    <input type="hidden" th:field="*{appointmentType}" value="ONLINE" />
+                                </div>
+
+                                <!-- Dentist Selection -->
+                                <div class="mb-3">
+                                    <label for="dentist" class="form-label">Select Dentist <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="dentist" th:field="*{dentistId}" required
+                                        th:disabled="${appointmentEntity.appointmentStatus == 'CONFIRMED' or appointmentEntity.appointmentStatus == 'CANCELLED'}">
+                                        <option value="">Choose a dentist...</option>
+                                        <option th:each="dentist : ${dentists}" th:value="${dentist.dentistId}"
+                                            th:text="${dentist.fullName + ' - ' + dentist.specialization}"
+                                            th:selected="${dentist.dentistId == appointmentEntity.dentist.dentistId}">
+                                            Dr. Smith - General Dentistry
+                                        </option>
+                                    </select>
+                                    <div class="form-text"
+                                        th:if="${appointmentEntity.appointmentStatus == 'CONFIRMED'}">
+                                        Dentist cannot be changed for confirmed appointments
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dentist')}"
+                                        th:errors="*{dentist}"></div>
+                                </div>
+
+                                <!-- Date and Time -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="appointmentDate" class="form-label">Preferred Date <span
+                                                class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="appointmentDate"
+                                            th:field="*{appointmentDate}"
+                                            th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                            th:disabled="${appointmentEntity.appointmentStatus == 'CONFIRMED' or appointmentEntity.appointmentStatus == 'CANCELLED'}"
+                                            required>
+                                        <div class="form-text"
+                                            th:if="${appointmentEntity.appointmentStatus == 'CONFIRMED'}">
+                                            Date cannot be changed for confirmed appointments
+                                        </div>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('appointmentDate')}"
+                                            th:errors="*{appointmentDate}"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="appointmentTime" class="form-label">Preferred Time <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="appointmentTime" th:field="*{appointmentTime}"
+                                            th:disabled="${appointmentEntity.appointmentStatus == 'CONFIRMED' or appointmentEntity.appointmentStatus == 'CANCELLED'}"
+                                            required>
+                                            <option value="">Select time...</option>
+                                            <option value="09:00"
+                                                th:selected="${appointment.appointmentTime == '09:00'}">9:00 AM</option>
+                                            <option value="09:30"
+                                                th:selected="${appointment.appointmentTime == '09:30'}">9:30 AM</option>
+                                            <option value="10:00"
+                                                th:selected="${appointment.appointmentTime == '10:00'}">10:00 AM
+                                            </option>
+                                            <option value="10:30"
+                                                th:selected="${appointment.appointmentTime == '10:30'}">10:30 AM
+                                            </option>
+                                            <option value="11:00"
+                                                th:selected="${appointment.appointmentTime == '11:00'}">11:00 AM
+                                            </option>
+                                            <option value="11:30"
+                                                th:selected="${appointment.appointmentTime == '11:30'}">11:30 AM
+                                            </option>
+                                            <option value="14:00"
+                                                th:selected="${appointment.appointmentTime == '14:00'}">2:00 PM</option>
+                                            <option value="14:30"
+                                                th:selected="${appointment.appointmentTime == '14:30'}">2:30 PM</option>
+                                            <option value="15:00"
+                                                th:selected="${appointment.appointmentTime == '15:00'}">3:00 PM</option>
+                                            <option value="15:30"
+                                                th:selected="${appointment.appointmentTime == '15:30'}">3:30 PM</option>
+                                            <option value="16:00"
+                                                th:selected="${appointment.appointmentTime == '16:00'}">4:00 PM</option>
+                                            <option value="16:30"
+                                                th:selected="${appointment.appointmentTime == '16:30'}">4:30 PM</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('appointmentTime')}"
+                                            th:errors="*{appointmentTime}"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Reason/Chief Complaint -->
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Reason for Visit <span
+                                            class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="reason" th:field="*{reason}" rows="3"
+                                        placeholder="Please describe your symptoms or concerns..." required></textarea>
+                                    <div class="form-text">Provide details about your dental concerns to help the
+                                        dentist prepare for your consultation.</div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}"
+                                        th:errors="*{reason}"></div>
+                                </div>
+
+                                <!-- Urgency Level -->
+                                <div class="mb-3">
+                                    <label for="urgency" class="form-label">Urgency Level</label>
+                                    <select class="form-select" id="urgency" th:field="*{urgency}">
+                                        <option value="LOW" th:selected="${appointment.urgency == 'LOW'}">Low - Routine
+                                            check-up or consultation</option>
+                                        <option value="MEDIUM" th:selected="${appointment.urgency == 'MEDIUM'}">Medium -
+                                            Some discomfort or concern</option>
+                                        <option value="HIGH" th:selected="${appointment.urgency == 'HIGH'}">High -
+                                            Significant pain or urgent issue</option>
+                                    </select>
+                                </div>
+
+                                <!-- Additional Notes -->
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Additional Notes</label>
+                                    <textarea class="form-control" id="notes" th:field="*{notes}" rows="2"
+                                        placeholder="Any additional information you'd like to share..."></textarea>
+                                </div>
+
+                                <!-- Appointment History -->
+                                <div class="mb-3" th:if="${appointment.createdDate}">
+                                    <h6><i class="fas fa-history"></i> Appointment History</h6>
+                                    <div class="small text-muted">
+                                        <div>Created: <span
+                                                th:text="${#temporals.format(appointment.createdDate, 'MMM dd, yyyy HH:mm')}"></span>
+                                        </div>
+                                        <div th:if="${appointment.lastModifiedDate}">
+                                            Last Modified: <span
+                                                th:text="${#temporals.format(appointment.lastModifiedDate, 'MMM dd, yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    <div>
+                                        <!-- Cancel Appointment Button -->
+                                        <button type="button" class="btn btn-outline-danger"
+                                            th:if="${appointmentEntity.appointmentStatus != 'CANCELLED'}"
+                                            data-bs-toggle="modal" data-bs-target="#cancelAppointmentModal">
+                                            <i class="fas fa-times"></i> Cancel Appointment
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments}"
+                                            class="btn btn-outline-secondary me-md-2">
+                                            <i class="fas fa-arrow-left"></i> Back to Appointments
+                                        </a>
+                                        <button type="submit" class="btn btn-warning"
+                                            th:disabled="${appointmentEntity.appointmentStatus == 'CANCELLED'}">
+                                            <i class="fas fa-save"></i> Update Appointment
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Cancel Appointment Modal -->
+        <div class="modal fade" id="cancelAppointmentModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning"></i> Cancel
+                            Appointment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to cancel this appointment?</p>
+                        <div class="alert alert-warning">
+                            <strong>Note:</strong> Cancelled appointments cannot be restored. You will need to book a
+                            new appointment if needed.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep
+                            Appointment</button>
+                        <form
+                            th:action="@{'/dentalsurgeryapp/rolebase/patient/appointments/' + ${appointment.appointmentId} + '/cancel'}"
+                            method="post" style="display: inline;">
+                            <!-- CSRF token for Spring Security -->
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Yes, Cancel Appointment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Add New User - Dental Surgery</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-user-plus"></i> Add New User
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error Messages -->
+                        <div th:if="${errors}" class="alert alert-danger">
+                            <h6>Please correct the following errors:</h6>
+                            <ul class="mb-0">
+                                <li th:each="error : ${errors}" th:text="${error.defaultMessage}"></li>
+                            </ul>
+                        </div>
+
+                        <div th:if="${usernameError}" class="alert alert-danger" th:text="${usernameError}"></div>
+                        <div th:if="${emailError}" class="alert alert-danger" th:text="${emailError}"></div>
+
+                        <form th:action="@{/dentalsurgeryapp/secured/sysadmin/usermgt/user/new}" th:object="${user}"
+                            method="post" novalidate>
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}" />
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                            th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"
+                                            required>
+                                        <div th:if="${#fields.hasErrors('firstName')}" class="invalid-feedback"
+                                            th:errors="*{firstName}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lastName" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                            th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"
+                                            required>
+                                        <div th:if="${#fields.hasErrors('lastName')}" class="invalid-feedback"
+                                            th:errors="*{lastName}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username *</label>
+                                        <input type="text" class="form-control" id="username" th:field="*{username}"
+                                            th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                            required>
+                                        <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback"
+                                            th:errors="*{username}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="email" th:field="*{email}"
+                                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''" required>
+                                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback"
+                                            th:errors="*{email}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}"
+                                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''" minlength="8"
+                                    required>
+                                <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback"
+                                    th:errors="*{password}"></div>
+                                <div class="form-text">Password must be at least 8 characters long.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" for="rolesContainer">Roles *</label>
+                                <div id="rolesContainer" th:if="${roles != null and !#lists.isEmpty(roles)}">
+                                    <div th:each="role : ${roles}" class="form-check">
+                                        <input type="checkbox" class="form-check-input" th:id="'role' + ${role.roleId}"
+                                            th:field="*{roles}" th:value="${role.roleId}"
+                                            th:classappend="${' role-' + #strings.toLowerCase(role.name)}">
+                                        <label class="form-check-label" th:for="'role' + ${role.roleId}"
+                                            th:text="${role.name}"></label>
+                                    </div>
+                                </div>
+                                <div th:if="${roles == null or #lists.isEmpty(roles)}" class="text-muted">
+                                    No roles available. Please create roles first.
+                                </div>
+                            </div>
+
+                            <!-- Link to Patient (only when PATIENT role selected) -->
+                            <div class="mb-3" id="patientLinkSection" style="display:none;">
+                                <label for="patientId" class="form-label">Link to Patient</label>
+                                <select class="form-select" id="patientId" name="patientId">
+                                    <option th:value="" selected>— Select Patient —</option>
+                                    <option th:each="p : ${patients}" th:value="${p.patientId}"
+                                        th:text="${(p.firstName != null ? p.firstName : '') + ' ' + (p.lastName != null ? p.lastName : '') + ' (' + (p.email != null ? p.email : '') + ')'}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Shown when the PATIENT role is selected.</div>
+                            </div>
+
+                            <!-- Link to Dentist (only when DENTIST role selected) -->
+                            <div class="mb-3" id="dentistLinkSection" style="display:none;">
+                                <label for="dentistId" class="form-label">Link to Dentist</label>
+                                <select class="form-select" id="dentistId" name="dentistId">
+                                    <option th:value="" selected>— Select Dentist —</option>
+                                    <option th:each="d : ${dentists}" th:value="${d.dentistId}"
+                                        th:text="${d.fullName + ' - ' + (d.specialization != null ? d.specialization : '')}">
+                                    </option>
+                                </select>
+                                <div class="form-text">Shown when the DENTIST role is selected.</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enabled"
+                                            th:field="*{enabled}" checked>
+                                        <label class="form-check-label" for="enabled">Account Enabled</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="accountNonLocked"
+                                            th:field="*{accountNonLocked}" checked>
+                                        <label class="form-check-label" for="accountNonLocked">Account Not
+                                            Locked</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden fields for UserDetails interface -->
+                            <input type="hidden" th:field="*{accountNonExpired}" value="true">
+                            <input type="hidden" th:field="*{credentialsNonExpired}" value="true">
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save User
+                                </button>
+                                <a th:href="@{/dentalsurgeryapp/secured/sysadmin/usermgt/list}"
+                                    class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <script>
+        (function () {
+            function updateLinkSections() {
+                var hasPatient = !!document.querySelector('input.role-patient:checked');
+                var hasDentist = !!document.querySelector('input.role-dentist:checked');
+                var patientSec = document.getElementById('patientLinkSection');
+                var dentistSec = document.getElementById('dentistLinkSection');
+                var patientSel = document.getElementById('patientId');
+                var dentistSel = document.getElementById('dentistId');
+                if (patientSec) {
+                    patientSec.style.display = hasPatient ? '' : 'none';
+                    if (patientSel) patientSel.required = hasPatient;
+                }
+                if (dentistSec) {
+                    dentistSec.style.display = hasDentist ? '' : 'none';
+                    if (dentistSel) dentistSel.required = hasDentist;
+                }
+            }
+            document.addEventListener('change', function (e) {
+                if (e.target && (e.target.matches('input.role-patient') || e.target.matches('input.role-dentist'))) {
+                    updateLinkSections();
+                }
+            });
+            document.addEventListener('DOMContentLoaded', updateLinkSections);
+            // Also run once in case content loaded before script
+            updateLinkSections();
+        })();
+    </script>
+</body>
+
+</html>

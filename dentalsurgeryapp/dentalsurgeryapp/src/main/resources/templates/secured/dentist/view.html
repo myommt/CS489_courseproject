@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title th:text="${pageTitle != null ? pageTitle : 'Dentist Details'}">Dentist Details</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <h2>Dentist Details</h2>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${dentist.firstName + ' ' + dentist.lastName}">Dentist Name</h5>
+                <p class="card-text mb-1">
+                    <strong>Email:</strong>
+                    <span th:text="${dentist.email}">email@example.com</span>
+                </p>
+                <p class="card-text mb-1">
+                    <strong>Contact:</strong>
+                    <span th:text="${dentist.contactNumber}">123-456-7890</span>
+                </p>
+                <p class="card-text mb-1">
+                    <strong>Specialization:</strong>
+                    <span th:text="${dentist.specialization}">General</span>
+                </p>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a class="btn btn-secondary" th:href="@{/secured/dentist/list}">Back to List</a>
+                <a class="btn btn-primary" th:href="@{'/secured/dentist/edit/' + ${dentist.dentistId}}">Edit</a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDentistModal"
+                    th:attr="data-dentist-id=${dentist.dentistId}, data-dentist-name=${dentist.firstName + ' ' + dentist.lastName}">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteDentistModal" tabindex="-1" aria-labelledby="deleteDentistModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteDentistModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete dentist <strong id="deleteDentistName"></strong>? This action cannot
+                    be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteDentistForm" method="post">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalEl = document.getElementById('deleteDentistModal');
+            if (!modalEl) return;
+            modalEl.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                if (!button) return;
+                const id = button.getAttribute('data-dentist-id');
+                const name = button.getAttribute('data-dentist-name');
+                const nameHolder = modalEl.querySelector('#deleteDentistName');
+                if (nameHolder) nameHolder.textContent = name || '';
+                const form = modalEl.querySelector('#deleteDentistForm');
+                if (form) {
+                    const target = '/secured/dentist/delete/' + id;
+                    form.setAttribute('action', window.location.origin + target);
+                }
+            });
+            const form = document.getElementById('deleteDentistForm');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    const action = form.getAttribute('action') || '';
+                    if (!/\/secured\/dentist\/delete\/\d+$/.test(action)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const header = modalEl.querySelector('.modal-header');
+                        if (header) {
+                            header.classList.add('bg-warning', 'text-dark');
+                            setTimeout(() => header.classList.remove('bg-warning', 'text-dark'), 600);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

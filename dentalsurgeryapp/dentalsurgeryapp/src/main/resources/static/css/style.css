@@ -1,0 +1,99 @@
+/* Global theme for Dental Surgery App */
+:root {
+    --brand: #0d6efd;
+    --brand-2: #0bbbd6;
+    --accent: #ffc107;
+    --muted: #6c757d;
+    --bg: #f7fbff;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background: var(--bg);
+}
+
+/* Header */
+.navbar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Containers */
+.container {
+    max-width: 1140px;
+}
+
+/* Cards */
+.card {
+    border: 0;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.08);
+    border-radius: 12px;
+}
+
+.card-header {
+    border-bottom: 0;
+    background: linear-gradient(90deg, rgba(13, 110, 253, 0.07) 0%, rgba(11, 187, 214, 0.06) 100%);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 10px;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 100%);
+    border: 0;
+}
+
+.btn-outline-primary {
+    color: var(--brand);
+    border-color: var(--brand);
+}
+
+.btn-outline-primary:hover {
+    background: var(--brand);
+    color: #fff;
+}
+
+/* Tables */
+.table thead {
+    background: linear-gradient(90deg, rgba(13, 110, 253, 0.08) 0%, rgba(11, 187, 214, 0.06) 100%);
+}
+
+.table-hover tbody tr:hover {
+    background: #eef6ff;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 10px;
+    border-color: #e2e8f0;
+}
+
+.form-control:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .1);
+}
+
+/* Hero */
+.hero-section .display-4 {
+    font-weight: 800;
+}
+
+/* Summary counters */
+.summary .card {
+    text-align: center;
+}
+
+.summary h4 {
+    font-weight: 700;
+}
+
+/* Footer */
+footer {
+    margin-top: 48px;
+    color: var(--muted);
+}

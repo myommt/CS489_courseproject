@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Edit Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-primary">
+                    <i class="fas fa-user-edit"></i> Edit Patient
+                    <small class="text-muted" th:if="${patient != null}" th:text="'ID: ' + ${patient.patientId}">
+                        ID: 1
+                    </small>
+                </h1>
+                <div>
+                    <a href="/secured/patient/list" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Patient List
+                    </a>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-edit"></i> Update Patient Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/secured/patient/edit/{id}(id=${patient?.patientId})}"
+                                th:object="${patient}" method="post">
+
+                                <!-- Hidden ID field -->
+                                <input type="hidden" th:field="*{patientId}">
+
+                                <!-- Personal Information -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label">
+                                            <i class="fas fa-user"></i> First Name *
+                                        </label>
+                                        <input type="text" class="form-control" th:field="*{firstName}" id="firstName"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}"
+                                            th:errors="*{firstName}">
+                                            First name is required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label">
+                                            <i class="fas fa-user"></i> Last Name *
+                                        </label>
+                                        <input type="text" class="form-control" th:field="*{lastName}" id="lastName"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                            th:errors="*{lastName}">
+                                            Last name is required
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="dob" class="form-label">
+                                            <i class="fas fa-calendar"></i> Date of Birth *
+                                        </label>
+                                        <input type="date" class="form-control" th:field="*{dob}"
+                                            th:value="${patient?.dob != null ? #temporals.format(patient.dob, 'yyyy-MM-dd') : ''}"
+                                            id="dob" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('dob')}"
+                                            th:errors="*{dob}">
+                                            Date of birth is required
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6"></div>
+                                </div>
+
+                                <!-- Contact Information -->
+                                <hr>
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-phone"></i> Contact Information
+                                </h6>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="contactNumber" class="form-label">
+                                            <i class="fas fa-phone"></i> Phone Number
+                                        </label>
+                                        <input type="tel" class="form-control" th:field="*{contactNumber}"
+                                            id="contactNumber" placeholder="(xxx) xxx-xxxx">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">
+                                            <i class="fas fa-envelope"></i> Email Address
+                                        </label>
+                                        <input type="email" class="form-control" th:field="*{email}" id="email"
+                                            placeholder="patient@example.com">
+                                    </div>
+                                </div>
+
+                                <!-- Address Information -->
+                                <hr>
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-home"></i> Address Information
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label for="addressStreet" class="form-label">
+                                        <i class="fas fa-road"></i> Street Address
+                                    </label>
+                                    <input type="text" class="form-control" th:field="*{address.street}"
+                                        id="addressStreet" placeholder="123 Main Street">
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="addressCity" class="form-label">
+                                            <i class="fas fa-city"></i> City
+                                        </label>
+                                        <input type="text" class="form-control" th:field="*{address.city}"
+                                            id="addressCity" placeholder="City">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="addressState" class="form-label">
+                                            <i class="fas fa-map"></i> State
+                                        </label>
+                                        <input type="text" class="form-control" th:field="*{address.state}"
+                                            id="addressState" placeholder="State">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="addressZipcode" class="form-label">
+                                            <i class="fas fa-mail-bulk"></i> ZIP Code
+                                        </label>
+                                        <input type="text" class="form-control" th:field="*{address.zipcode}"
+                                            id="addressZipcode" placeholder="12345">
+                                    </div>
+                                </div>
+
+                                <!-- Patient Status (removed fields not present in model) -->
+
+                                <!-- Form Actions -->
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="button" class="btn btn-danger" onclick="openDeleteModal()">
+                                            <i class="fas fa-trash"></i> Delete Patient
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-secondary me-2" onclick="history.back()">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fas fa-save"></i> Update Patient
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- Hidden delete form (must not be nested inside the main form) -->
+                            <form th:action="@{/secured/patient/delete/{id}(id=${patient?.patientId})}" method="post"
+                                id="deleteForm" style="display:none;">
+                                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}" />
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Patient Activity Card -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <h5 class="text-primary">0</h5>
+                                    <small class="text-muted">Total Appointments</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="text-success">0</h5>
+                                    <small class="text-muted">Completed Visits</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="text-info">0</h5>
+                                    <small class="text-muted">Upcoming Appointments</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <h5 class="text-warning">$0.00</h5>
+                                    <small class="text-muted">Outstanding Balance</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex gap-2 flex-wrap justify-content-center">
+                                <a href="#" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-calendar-plus"></i> Schedule Appointment
+                                </a>
+                                <a href="#" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-file-medical"></i> View Medical History
+                                </a>
+                                <a href="#" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-file-invoice"></i> View Bills
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <!-- Styled Delete Confirmation Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel"><i
+                            class="fas fa-triangle-exclamation me-2"></i> Confirm Deletion</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to delete patient
+                        <strong
+                            th:text="${patient != null ? patient.firstName + ' ' + patient.lastName : ''}"></strong>?
+                        This action cannot be undone.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
+                        Cancel</button>
+                    <button type="button" id="confirmDeleteModalConfirm" class="btn btn-danger"><i
+                            class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openDeleteModal() {
+            const modalEl = document.getElementById('confirmDeleteModal');
+            if (window.bootstrap && bootstrap.Modal && modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            } else {
+                console.warn('Bootstrap Modal not available; confirmation modal not shown.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmBtn = document.getElementById('confirmDeleteModalConfirm');
+            const modalEl = document.getElementById('confirmDeleteModal');
+            let modalInstance = null;
+            if (window.bootstrap && bootstrap.Modal && modalEl) {
+                modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+            }
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function () {
+                    const form = document.getElementById('deleteForm');
+                    if (form) form.submit();
+                    if (modalInstance) modalInstance.hide();
+                });
+            }
+        });
+
+        // Auto-format phone number
+        const phoneInput = document.getElementById('contactNumber');
+        if (phoneInput) phoneInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+            } else if (value.length >= 3) {
+                value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+
+        // Highlight changed fields
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = document.querySelectorAll('input:not([readonly]), textarea');
+            const originalValues = {};
+
+            inputs.forEach(input => {
+                originalValues[input.id] = input.value;
+                input.addEventListener('input', function () {
+                    if (this.value !== originalValues[this.id]) {
+                        this.classList.add('border-warning');
+                    } else {
+                        this.classList.remove('border-warning');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .form-label {
+            font-weight: 600;
+        }
+
+        .card {
+            border-radius: 10px;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .border-warning {
+            border-color: #ffc107 !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+    </style>
+</body>
+
+</html>

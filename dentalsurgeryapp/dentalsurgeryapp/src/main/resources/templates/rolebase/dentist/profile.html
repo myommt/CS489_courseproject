@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>My Profile - Dental Surgery</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-user-edit"></i> My Profile
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error Messages -->
+                        <div th:if="${errors}" class="alert alert-danger">
+                            <h6>Please correct the following errors:</h6>
+                            <ul class="mb-0">
+                                <li th:each="error : ${errors}" th:text="${error.defaultMessage}"></li>
+                            </ul>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                        <form th:action="@{/dentalsurgeryapp/rolebase/dentist/profile}" th:object="${dentist}"
+                            method="post" novalidate>
+
+                            <!-- Hidden ID field -->
+                            <input type="hidden" th:field="*{dentistId}">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="firstName" class="form-label">First Name *</label>
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                            th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"
+                                            required>
+                                        <div th:if="${#fields.hasErrors('firstName')}" class="invalid-feedback"
+                                            th:errors="*{firstName}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="lastName" class="form-label">Last Name *</label>
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                            th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"
+                                            required>
+                                        <div th:if="${#fields.hasErrors('lastName')}" class="invalid-feedback"
+                                            th:errors="*{lastName}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" th:field="*{email}"
+                                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback"
+                                            th:errors="*{email}"></div>
+                                        <div class="form-text">This should match your login email.</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="contactNumber" class="form-label">Contact Number</label>
+                                        <input type="tel" class="form-control" id="contactNumber"
+                                            th:field="*{contactNumber}"
+                                            th:classappend="${#fields.hasErrors('contactNumber')} ? 'is-invalid' : ''"
+                                            placeholder="e.g., +1-555-123-4567">
+                                        <div th:if="${#fields.hasErrors('contactNumber')}" class="invalid-feedback"
+                                            th:errors="*{contactNumber}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="specialization" class="form-label">Specialization</label>
+                                <select class="form-select" id="specialization" th:field="*{specialization}"
+                                    th:classappend="${#fields.hasErrors('specialization')} ? 'is-invalid' : ''">
+                                    <option value="">Select Specialization</option>
+                                    <option value="General Dentistry">General Dentistry</option>
+                                    <option value="Orthodontics">Orthodontics</option>
+                                    <option value="Oral Surgery">Oral Surgery</option>
+                                    <option value="Periodontics">Periodontics</option>
+                                    <option value="Endodontics">Endodontics</option>
+                                    <option value="Prosthodontics">Prosthodontics</option>
+                                    <option value="Pediatric Dentistry">Pediatric Dentistry</option>
+                                    <option value="Oral Pathology">Oral Pathology</option>
+                                    <option value="Cosmetic Dentistry">Cosmetic Dentistry</option>
+                                    <option value="Implantology">Implantology</option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('specialization')}" class="invalid-feedback"
+                                    th:errors="*{specialization}"></div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Update Profile
+                                </button>
+                                <a th:href="@{/dentalsurgeryapp/rolebase/dentist/dashboard}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Profile Information Card -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle"></i> Profile Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-lightbulb"></i> Profile Tips:</h6>
+                            <ul class="mb-0">
+                                <li>Keep your contact information up to date for better communication</li>
+                                <li>Your email should match your login credentials</li>
+                                <li>Specialization helps patients find the right dentist for their needs</li>
+                                <li>Profile changes are immediately saved and visible to patients</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

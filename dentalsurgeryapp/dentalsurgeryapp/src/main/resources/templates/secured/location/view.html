@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Location Details</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="text-secondary"><i class="fas fa-hospital"></i> Location Details</h1>
+                <div class="btn-group">
+                    <a th:href="@{/secured/location/edit/{id}(id=${location.surgeryLocationId})}"
+                        class="btn btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                    <a href="/secured/location/list" class="btn btn-secondary"><i class="fas fa-arrow-left"></i>
+                        Back</a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteLocationModal"
+                        th:attr="data-entity-id=${location.surgeryLocationId}, data-entity-name=${location.name}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9" th:text="${location.name}">Downtown Clinic</dd>
+                        <dt class="col-sm-3">Contact</dt>
+                        <dd class="col-sm-9"><a th:href="${'tel:' + location.contactNumber}"
+                                th:text="${location.contactNumber}">(641) 555-1234</a></dd>
+                        <dt class="col-sm-3">Address</dt>
+                        <dd class="col-sm-9">
+                            <span th:if="${location.location != null}"
+                                th:text="${location.location.street + ', ' + location.location.city + ', ' + location.location.state + ' ' + location.location.zipcode}">123
+                                Main St, Fairfield, IA 52557</span>
+                            <span th:if="${location.location == null}" class="text-muted">No address on file</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </main>
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteLocationModal" tabindex="-1" aria-labelledby="deleteLocationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteLocationModalLabel">Confirm Delete</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">Are you sure you want to delete location <strong
+                                id="deleteLocationEntityName">this location</strong>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form id="deleteLocationForm" method="post"
+                            th:action="@{'/secured/location/delete/' + ${location.surgeryLocationId}}">
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}" />
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+        <script th:inline="javascript">
+            (function () {
+                var modal = document.getElementById('deleteLocationModal');
+                if (!modal) return;
+                modal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    if (!button) return;
+                    var id = button.getAttribute('data-entity-id');
+                    var name = button.getAttribute('data-entity-name') || 'this location';
+                    var form = document.getElementById('deleteLocationForm');
+                    var nameEl = document.getElementById('deleteLocationEntityName');
+                    if (nameEl) nameEl.textContent = name;
+                    if (form && id) {
+                        var target = '/secured/location/delete/' + id;
+                        form.setAttribute('action', window.location.origin + target);
+                    }
+                });
+                var form = document.getElementById('deleteLocationForm');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        var action = form.getAttribute('action');
+                        if (!action || !/\/secured\/location\/delete\/\d+$/.test(action)) {
+                            e.preventDefault();
+                        }
+                    });
+                }
+            })();
+        </script>
+    </div>
+</body>
+
+</html>

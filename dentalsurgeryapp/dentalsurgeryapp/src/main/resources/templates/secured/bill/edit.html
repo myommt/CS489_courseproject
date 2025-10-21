@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Edit Bill</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="text-primary">
+                    <i class="fas fa-edit"></i> Edit Bill
+                </h1>
+                <a href="/secured/bill/list" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Bills
+                </a>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Bill Information</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/secured/bill/edit/{id}(id=${bill.billId})}" th:object="${bill}" method="post">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="patient" class="form-label">Patient <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="patient" th:field="*{patient.patientId}" required
+                                    disabled>
+                                    <option value="">Select Patient</option>
+                                    <option th:each="patient : ${patients}" th:value="${patient.patientId}"
+                                        th:text="${patient.firstName + ' ' + patient.lastName + ' (' + patient.email + ')'}">
+                                    </option>
+                                </select>
+                                <!-- Disabled inputs are not submitted; include hidden field to submit the value -->
+                                <input type="hidden" th:field="*{patient.patientId}" />
+                                <small class="text-muted">Patient cannot be changed after bill creation</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="appointment" class="form-label">Appointment <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="appointment" th:field="*{appointment.appointmentId}"
+                                    required disabled>
+                                    <option value="">Select Appointment</option>
+                                    <option th:each="appointment : ${appointments}"
+                                        th:value="${appointment.appointmentId}"
+                                        th:text="${appointment.appointmentType + ' - ' + #temporals.format(appointment.appointmentDateTime, 'yyyy-MM-dd HH:mm')}">
+                                    </option>
+                                </select>
+                                <!-- Hidden to carry value since select is disabled -->
+                                <input type="hidden" th:field="*{appointment.appointmentId}" />
+                                <small class="text-muted">Appointment cannot be changed after bill creation</small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="totalCost" class="form-label">Total Cost <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="totalCost" th:field="*{totalCost}"
+                                        step="0.01" min="0" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="paymentStatus" class="form-label">Payment Status <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="paymentStatus" th:field="*{paymentStatus}" required>
+                                    <option value="">Select Status</option>
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PAID">PAID</option>
+                                    <option value="OVERDUE">OVERDUE</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Bill
+                            </button>
+                            <a href="/secured/bill/list" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</body>
+
+</html>

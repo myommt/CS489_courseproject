@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title th:text="${pageTitle != null ? pageTitle : 'Appointment Details'}">Appointment Details</title>
+    <meta charset="UTF-8" />
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container mt-4">
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <h2>Appointment Details</h2>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Appointment <span th:text="${appointment.appointmentId}">#</span></h5>
+                <p class="mb-1"><strong>Type:</strong> <span th:text="${appointment.appointmentType}">Checkup</span></p>
+                <p class="mb-1"><strong>Status:</strong> <span
+                        th:text="${appointment.appointmentStatus}">Scheduled</span></p>
+                <p class="mb-1"><strong>Date/Time:</strong> <span
+                        th:text="${#temporals.format(appointment.appointmentDateTime, 'yyyy-MM-dd HH:mm')}">2025-01-01
+                        09:00</span></p>
+                <p class="mb-1"><strong>Patient:</strong> <span
+                        th:text="${appointment.patient != null ? appointment.patient.firstName + ' ' + appointment.patient.lastName : ''}">John
+                        Doe</span></p>
+                <p class="mb-1"><strong>Dentist:</strong> <span
+                        th:text="${appointment.dentist != null ? appointment.dentist.firstName + ' ' + appointment.dentist.lastName : ''}">Dr.
+                        Smith</span></p>
+                <p class="mb-1"><strong>Location:</strong> <span
+                        th:text="${appointment.surgeryLocation != null ? appointment.surgeryLocation.name : ''}">Room
+                        1</span></p>
+            </div>
+            <div class="card-footer d-flex gap-2">
+                <a class="btn btn-secondary" th:href="@{/secured/appointment/list}">Back to List</a>
+                <a class="btn btn-primary" th:if="${appointment.appointmentId != null}"
+                    th:href="@{/secured/appointment/edit/{id}(id=${appointment.appointmentId})}">Edit</a>
+                <button class="btn btn-primary" th:if="${appointment.appointmentId == null}" disabled
+                    title="No ID">Edit</button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteAppointmentModal"
+                    th:attr="data-entity-id=${appointment.appointmentId},
+                             data-entity-name=${(appointment.patient != null ? appointment.patient.firstName + ' ' + appointment.patient.lastName : 'this appointment')}">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Are you sure you want to delete appointment for <strong
+                            id="deleteApptEntityName">this record</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteApptForm" method="post"
+                        th:action="@{'/secured/appointment/delete/' + ${appointment.appointmentId}}">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        (function () {
+            var modal = document.getElementById('deleteAppointmentModal');
+            if (!modal) return;
+            modal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                if (!button) return;
+                var id = button.getAttribute('data-entity-id');
+                var name = button.getAttribute('data-entity-name') || 'this appointment';
+                var form = document.getElementById('deleteApptForm');
+                var nameEl = document.getElementById('deleteApptEntityName');
+                if (nameEl) nameEl.textContent = name;
+                if (form && id) {
+                    var target = '/secured/appointment/delete/' + id;
+                    form.setAttribute('action', window.location.origin + target);
+                }
+            });
+            var form = document.getElementById('deleteApptForm');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    var action = form.getAttribute('action');
+                    if (!action || !/\/secured\/appointment\/delete\/\d+$/.test(action)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

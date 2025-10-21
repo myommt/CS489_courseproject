@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>My Appointments - Dental Surgery</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <i class="fas fa-calendar-alt"></i> My Appointments
+                        <small class="text-muted">Dr. <span
+                                th:text="${dentist.firstName + ' ' + dentist.lastName}"></span></small>
+                    </h2>
+                    <a th:href="@{/dentalsurgeryapp/rolebase/dentist/dashboard}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+                <!-- Filter and Search -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/dentalsurgeryapp/rolebase/dentist/appointments}" method="get"
+                            class="row g-3">
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Filter by Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Statuses</option>
+                                    <option th:each="status : ${appointmentStatuses}" th:value="${status.name()}"
+                                        th:text="${status.name()}" th:selected="${selectedStatus == status.name()}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sortBy" class="form-label">Sort By</label>
+                                <select class="form-select" id="sortBy" name="sortBy">
+                                    <option value="appointmentDateTime"
+                                        th:selected="${sortBy == 'appointmentDateTime'}">Date & Time</option>
+                                    <option value="appointmentStatus" th:selected="${sortBy == 'appointmentStatus'}">
+                                        Status</option>
+                                    <option value="appointmentType" th:selected="${sortBy == 'appointmentType'}">Type
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sortDir" class="form-label">Order</label>
+                                <select class="form-select" id="sortDir" name="sortDir">
+                                    <option value="asc" th:selected="${sortDir == 'asc'}">Ascending</option>
+                                    <option value="desc" th:selected="${sortDir == 'desc'}">Descending</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Appointments List -->
+                <div th:if="${appointments != null and appointments.hasContent()}" class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Date &amp; Time</th>
+                                        <th>Patient</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="appointment : ${appointments.content}">
+                                        <td>
+                                            <div>
+                                                <strong
+                                                    th:text="${#temporals.format(appointment.appointmentDateTime, 'MMM dd, yyyy')}"></strong>
+                                            </div>
+                                            <small class="text-muted"
+                                                th:text="${#temporals.format(appointment.appointmentDateTime, 'hh:mm a')}"></small>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong
+                                                    th:text="${appointment.patient != null ? appointment.patient.firstName + ' ' + appointment.patient.lastName : 'Unknown Patient'}"></strong>
+                                            </div>
+                                            <small class="text-muted"
+                                                th:text="${appointment.patient != null ? appointment.patient.email : ''}"
+                                                th:if="${appointment.patient != null and appointment.patient.email != null}"></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${appointment.appointmentType}"></span>
+                                        </td>
+                                        <td>
+                                            <span th:switch="${appointment.appointmentStatus}">
+                                                <span th:case="'SCHEDULED'" class="badge bg-primary">Scheduled</span>
+                                                <span th:case="'CONFIRMED'" class="badge bg-success">Confirmed</span>
+                                                <span th:case="'COMPLETED'" class="badge bg-success">Completed</span>
+                                                <span th:case="'CANCELLED'" class="badge bg-danger">Cancelled</span>
+                                                <span th:case="'NO_SHOW'" class="badge bg-warning">No Show</span>
+                                                <span th:case="*" class="badge bg-secondary"
+                                                    th:text="${appointment.appointmentStatus}">Status</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div th:if="${appointment.surgeryLocation != null}">
+                                                <div th:text="${appointment.surgeryLocation.name}"></div>
+                                                <small class="text-muted"
+                                                    th:if="${appointment.surgeryLocation.location != null}">
+                                                    <span
+                                                        th:text="${appointment.surgeryLocation.location.city}"></span>,
+                                                    <span
+                                                        th:text="${appointment.surgeryLocation.location.state}"></span>
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/dentalsurgeryapp/rolebase/dentist/appointments/{appointmentId}/edit(appointmentId=${appointment.appointmentId})}"
+                                                    class="btn btn-sm btn-outline-primary" title="Edit Appointment">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav th:if="${appointments.totalPages > 1}" aria-label="Appointments pagination">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${!appointments.hasPrevious()} ? 'disabled'">
+                                    <a class="page-link"
+                                        th:href="@{/dentalsurgeryapp/rolebase/dentist/appointments(page=${currentPage - 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${selectedStatus})}">
+                                        Previous
+                                    </a>
+                                </li>
+
+                                <li th:each="pageNum : ${#numbers.sequence(0, appointments.totalPages - 1)}"
+                                    class="page-item" th:classappend="${pageNum == currentPage} ? 'active'">
+                                    <a class="page-link"
+                                        th:href="@{/dentalsurgeryapp/rolebase/dentist/appointments(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${selectedStatus})}"
+                                        th:text="${pageNum + 1}">1</a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${!appointments.hasNext()} ? 'disabled'">
+                                    <a class="page-link"
+                                        th:href="@{/dentalsurgeryapp/rolebase/dentist/appointments(page=${currentPage + 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${selectedStatus})}">
+                                        Next
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- No Appointments Message -->
+                <div th:if="${appointments == null or !appointments.hasContent()}" class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span th:if="${selectedStatus != null and !#strings.isEmpty(selectedStatus)}">No appointments found
+                        with the selected status.</span>
+                    <span th:unless="${selectedStatus != null and !#strings.isEmpty(selectedStatus)}">You don't have any
+                        appointments scheduled yet.</span>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3"
+                    role="alert">
+                    <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

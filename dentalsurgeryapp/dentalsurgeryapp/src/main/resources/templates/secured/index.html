@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Dental Surgery - Admin Dashboard</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="page-header text-center mb-4">
+                <h1 class="display-4 text-primary">
+                    <i class="fas fa-shield-alt"></i> Admin Dashboard
+                </h1>
+                <p class="lead">Welcome to the Dental Surgery Management System</p>
+            </div>
+
+            <!-- Dashboard Statistics -->
+            <div class="row mb-5">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <h4>Total Patients</h4>
+                            <h2 th:text="${totalPatients}">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-md fa-2x mb-2"></i>
+                            <h4>Total Dentists</h4>
+                            <h2 th:text="${totalDentists}">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                            <h4>Today's Appointments</h4>
+                            <h2 th:text="${todayAppointments}">0</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
+                            <h4>Pending Bills</h4>
+                            <h2 th:text="${pendingBills}">0</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Sections -->
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-injured"></i> Patient Management
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Manage patient records, view patient information, and handle patient-related operations.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/secured/patient/list" class="btn btn-primary">
+                                    <i class="fas fa-list"></i> View All Patients
+                                </a>
+                                <a href="/secured/patient/new" class="btn btn-outline-primary">
+                                    <i class="fas fa-plus"></i> Add New Patient
+                                </a>
+                                <a href="/secured/patient/search" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i> Search Patients
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-md"></i> Dentist Management
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Manage dentist profiles, schedules, and professional information.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/secured/dentist/list" class="btn btn-success">
+                                    <i class="fas fa-list"></i> View All Dentists
+                                </a>
+                                <a href="/secured/dentist/new" class="btn btn-outline-success">
+                                    <i class="fas fa-plus"></i> Add New Dentist
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar-alt"></i> Appointments
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Schedule and manage patient appointments with dentists.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/secured/appointment/list" class="btn btn-info">
+                                    <i class="fas fa-list"></i> View All Appointments
+                                </a>
+                                <a href="/secured/appointment/new" class="btn btn-outline-info">
+                                    <i class="fas fa-plus"></i> Schedule Appointment
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-map-marker-alt"></i> Locations
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Manage surgery locations and facility information.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/secured/location/list" class="btn btn-secondary">
+                                    <i class="fas fa-list"></i> View All Locations
+                                </a>
+                                <a href="/secured/location/new" class="btn btn-outline-secondary">
+                                    <i class="fas fa-plus"></i> Add New Location
+                                </a>
+                                <a href="/secured/address/list" class="btn btn-outline-secondary">
+                                    <i class="fas fa-address-card"></i> Manage Addresses
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-invoice-dollar"></i> Billing Management
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Manage billing, invoices, and payment tracking for services.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/secured/bill/list" class="btn btn-warning">
+                                    <i class="fas fa-list"></i> View All Bills
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users-cog"></i> System Administration
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Manage system users, roles, and administrative functions.
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a href="/dentalsurgeryapp/secured/sysadmin/usermgt/list" class="btn btn-danger">
+                                    <i class="fas fa-users"></i> User Management
+                                </a>
+                                <a href="/dentalsurgeryapp/secured/sysadmin/usermgt/user/new"
+                                    class="btn btn-outline-danger">
+                                    <i class="fas fa-user-plus"></i> Add New User
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <style>
+        .card {
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+    </style>
+</body>
+
+</html>

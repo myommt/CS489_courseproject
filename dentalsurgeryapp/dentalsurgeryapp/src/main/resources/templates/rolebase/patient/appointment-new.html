@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>Book Appointment - Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>
+                                <i class="fas fa-calendar-plus text-primary"></i>
+                                Book Online Appointment
+                            </h4>
+                            <p class="mb-0 text-muted">Schedule your online dental consultation</p>
+                        </div>
+                        <div class="card-body">
+                            <!-- Success/Error Messages -->
+                            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show"
+                                role="alert">
+                                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+
+                            <form th:action="@{/dentalsurgeryapp/rolebase/patient/appointments/new}"
+                                th:object="${appointment}" method="post">
+
+                                <!-- Hidden field for Patient ID - automatically set from logged-in patient -->
+                                <input type="hidden" th:field="*{patientId}" />
+
+                                <!-- Appointment Type (Fixed as Online) -->
+                                <div class="mb-3">
+                                    <label class="form-label">Appointment Type</label>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-video"></i> Online Consultation
+                                        <small class="d-block">All appointments are conducted via secure video
+                                            call</small>
+                                    </div>
+                                    <input type="hidden" th:field="*{appointmentType}" value="ONLINE" />
+                                </div>
+
+                                <!-- Dentist Selection -->
+                                <div class="mb-3">
+                                    <label for="dentist" class="form-label">Select Dentist <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="dentist" th:field="*{dentistId}" required>
+                                        <option value="">Choose a dentist...</option>
+                                        <option th:each="dentist : ${dentists}" th:value="${dentist.dentistId}"
+                                            th:text="${dentist.fullName + ' - ' + dentist.specialization}">
+                                            Dr. Smith - General Dentistry
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('dentistId')}"
+                                        th:errors="*{dentistId}"></div>
+                                    <div class="form-text text-danger"
+                                        th:if="${errorMessage != null and errorMessage.contains('Dentist')}">
+                                        Please select a dentist to continue.
+                                    </div>
+                                </div>
+
+                                <!-- Surgery Location Selection -->
+                                <div class="mb-3">
+                                    <label for="surgeryLocation" class="form-label">Select Surgery Location <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="surgeryLocation" th:field="*{surgeryLocationId}"
+                                        required>
+                                        <option value="">Choose a surgery location...</option>
+                                        <option th:each="location : ${surgeryLocations}"
+                                            th:value="${location.surgeryLocationId}"
+                                            th:text="${location.name + ' - ' + location.contactNumber}">
+                                            Main Clinic - (555) 123-4567
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('surgeryLocationId')}"
+                                        th:errors="*{surgeryLocationId}"></div>
+                                    <div class="form-text text-danger"
+                                        th:if="${errorMessage != null and errorMessage.contains('Surgery location')}">
+                                        Please select a surgery location to continue.
+                                    </div>
+                                </div>
+
+                                <!-- Date and Time -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="appointmentDate" class="form-label">Preferred Date <span
+                                                class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="appointmentDate"
+                                            th:field="*{appointmentDate}"
+                                            th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                            required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('appointmentDate')}"
+                                            th:errors="*{appointmentDate}"></div>
+                                        <div class="form-text text-danger"
+                                            th:if="${errorMessage != null and errorMessage.contains('date')}">
+                                            Please select a valid appointment date.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="appointmentTime" class="form-label">Preferred Time <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="appointmentTime" th:field="*{appointmentTime}"
+                                            required>
+                                            <option value="">Select time...</option>
+                                            <option value="09:00">9:00 AM</option>
+                                            <option value="09:30">9:30 AM</option>
+                                            <option value="10:00">10:00 AM</option>
+                                            <option value="10:30">10:30 AM</option>
+                                            <option value="11:00">11:00 AM</option>
+                                            <option value="11:30">11:30 AM</option>
+                                            <option value="14:00">2:00 PM</option>
+                                            <option value="14:30">2:30 PM</option>
+                                            <option value="15:00">3:00 PM</option>
+                                            <option value="15:30">3:30 PM</option>
+                                            <option value="16:00">4:00 PM</option>
+                                            <option value="16:30">4:30 PM</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('appointmentTime')}"
+                                            th:errors="*{appointmentTime}"></div>
+                                        <div class="form-text text-danger"
+                                            th:if="${errorMessage != null and errorMessage.contains('time')}">
+                                            Please select a preferred appointment time.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reason/Chief Complaint -->
+                                <div class="mb-3">
+                                    <label for="reason" class="form-label">Reason for Visit <span
+                                            class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="reason" th:field="*{reason}" rows="3"
+                                        placeholder="Please describe your symptoms or concerns..." required></textarea>
+                                    <div class="form-text">Provide details about your dental concerns to help the
+                                        dentist prepare for your consultation.</div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('reason')}"
+                                        th:errors="*{reason}"></div>
+                                    <div class="form-text text-danger"
+                                        th:if="${errorMessage != null and errorMessage.contains('Reason')}">
+                                        Please describe your reason for the visit.
+                                    </div>
+                                </div>
+
+                                <!-- Urgency Level -->
+                                <div class="mb-3">
+                                    <label for="urgency" class="form-label">Urgency Level</label>
+                                    <select class="form-select" id="urgency" th:field="*{urgency}">
+                                        <option value="LOW">Low - Routine check-up or consultation</option>
+                                        <option value="MEDIUM" selected>Medium - Some discomfort or concern</option>
+                                        <option value="HIGH">High - Significant pain or urgent issue</option>
+                                    </select>
+                                </div>
+
+                                <!-- Additional Notes -->
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Additional Notes</label>
+                                    <textarea class="form-control" id="notes" th:field="*{notes}" rows="2"
+                                        placeholder="Any additional information you'd like to share..."></textarea>
+                                </div>
+
+                                <!-- Online Consultation Info -->
+                                <div class="alert alert-light border-primary mb-4">
+                                    <h6><i class="fas fa-info-circle text-primary"></i> Online Consultation Information
+                                    </h6>
+                                    <ul class="mb-0 small">
+                                        <li>You will receive a video call link via email before your appointment</li>
+                                        <li>Ensure you have a stable internet connection and a device with
+                                            camera/microphone</li>
+                                        <li>Have a well-lit area for the consultation</li>
+                                        <li>Emergency cases requiring immediate physical examination will be redirected
+                                            to in-person visits</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments}"
+                                        class="btn btn-outline-secondary me-md-2">
+                                        <i class="fas fa-arrow-left"></i> Back to Appointments
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" onclick="return validateForm()">
+                                        <i class="fas fa-calendar-check"></i> Book Appointment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+
+    <script>
+        function validateForm() {
+            let isValid = true;
+            let errorMessage = '';
+
+            // Check dentist selection
+            const dentist = document.getElementById('dentist').value;
+            if (!dentist) {
+                errorMessage += 'Please select a dentist.\n';
+                isValid = false;
+            }
+
+            // Check appointment date
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            if (!appointmentDate) {
+                errorMessage += 'Please select an appointment date.\n';
+                isValid = false;
+            } else {
+                // Check if date is not in the past
+                const selectedDate = new Date(appointmentDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (selectedDate < today) {
+                    errorMessage += 'Please select a future date.\n';
+                    isValid = false;
+                }
+            }
+
+            // Check appointment time
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            if (!appointmentTime) {
+                errorMessage += 'Please select an appointment time.\n';
+                isValid = false;
+            }
+
+            // Check reason
+            const reason = document.getElementById('reason').value.trim();
+            if (!reason) {
+                errorMessage += 'Please provide a reason for your visit.\n';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                alert('Please correct the following errors:\n\n' + errorMessage);
+                return false;
+            }
+
+            return true;
+        }
+
+        // Auto-fill current date as minimum date
+        document.addEventListener('DOMContentLoaded', function () {
+            const dateInput = document.getElementById('appointmentDate');
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+        });
+    </script>
+</body>
+
+</html>

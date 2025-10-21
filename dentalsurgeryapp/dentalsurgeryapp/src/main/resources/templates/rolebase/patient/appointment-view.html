@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/head-elements :: headElements}">
+    <title>View Appointment - Patient</title>
+</head>
+
+<body>
+    <div id="page-content">
+        <header th:replace="~{fragments/header :: header}"></header>
+        <main class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>
+                                <i class="fas fa-eye text-info"></i>
+                                Appointment Details
+                            </h4>
+                            <p class="mb-0 text-muted">Review your appointment information</p>
+                        </div>
+                        <div class="card-body">
+                            <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+                            </div>
+                            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+                            </div>
+
+                            <dl class="row">
+                                <dt class="col-sm-4">Date</dt>
+                                <dd class="col-sm-8"
+                                    th:text="${#temporals.format(appointment.appointmentDateTime, 'MMM dd, yyyy')}">Aug
+                                    01, 2025</dd>
+
+                                <dt class="col-sm-4">Time</dt>
+                                <dd class="col-sm-8"
+                                    th:text="${#temporals.format(appointment.appointmentDateTime, 'hh:mm a')}">09:00 AM
+                                </dd>
+
+                                <dt class="col-sm-4">Dentist</dt>
+                                <dd class="col-sm-8" th:text="${appointment.dentist.fullName}">Dr. Smith</dd>
+
+                                <dt class="col-sm-4">Type</dt>
+                                <dd class="col-sm-8"><span class="badge bg-primary"
+                                        th:text="${appointment.appointmentType}">ONLINE</span></dd>
+
+                                <dt class="col-sm-4">Status</dt>
+                                <dd class="col-sm-8"><span class="badge bg-secondary"
+                                        th:text="${appointment.appointmentStatus}">PENDING</span></dd>
+
+                                <dt class="col-sm-4">Surgery Location</dt>
+                                <dd class="col-sm-8" th:text="${appointment.surgeryLocation.name}">Main Clinic</dd>
+
+                                <dt class="col-sm-4">Reason / Notes</dt>
+                                <!-- Notes field removed: not present in Appointment model -->
+
+                                <dt class="col-sm-4">Patient</dt>
+                                <dd class="col-sm-8"
+                                    th:text="${appointment.patient.firstName + ' ' + appointment.patient.lastName}">John
+                                    Doe</dd>
+
+                                <dt class="col-sm-4">Created</dt>
+                                <!-- Created date field removed: not present in Appointment model -->
+                            </dl>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments}"
+                                    class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Appointments
+                                </a>
+                                <div>
+                                    <a th:href="@{/dentalsurgeryapp/rolebase/patient/appointments/{id}/edit(id=${appointment.appointmentId})}"
+                                        class="btn btn-warning"
+                                        th:if="${appointment.appointmentStatus == 'PENDING' or appointment.appointmentStatus == 'CONFIRMED'}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</body>
+
+</html>
