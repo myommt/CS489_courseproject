@@ -1,44 +1,93 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dentalsurgeryapp-deployment
+  name: k8swf
   labels:
-    app: dentalsurgeryapp
+    app.kubernetes.io/name: k8swf
+    kubernetes.azure.com/generator: draft
+  namespace: k8snamespace
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: dentalsurgeryapp
+      app.kubernetes.io/name: k8swf
   template:
     metadata:
       labels:
-        app: dentalsurgeryapp
+        app.kubernetes.io/name: k8swf
     spec:
       containers:
-        - name: dentalsurgeryapp
-          image: myommt/dentalsurgeryapp2-aks:latest
-          imagePullPolicy: IfNotPresent
+        - name: k8swf
+          image: k8srgy.azurecr.io/k8srgyimage:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8083
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "250"
+              memory: "100"
             limits:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "256"
+              memory: "200"
+          envFrom:
+            - configMapRef:
+                name: k8swf-config
+            - secretRef:
+                name: secret-ref
+                optional: true
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8083
-            initialDelaySeconds: 30
-            periodSeconds: 20
-            failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: 8083
-            initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 1
             failureThreshold: 3
-      # Optional service account, tolerations, nodeSelector can be added here
+            successThreshold: 1
+            initialDelaySeconds: 0
+          startupProbe:
+            tcpSocket:
+              port: 8083
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 0
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - SETPCAP
+                - MKNOD
+                - AUDIT_WRITE
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - FSETID
+                - KILL
+                - SETGID
+                - SETUID
+                - NET_BIND_SERVICE
+                - SYS_CHROOT
+                - SETFCAP
+                - SYS_PTRACE
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: k8swf
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: k8swf

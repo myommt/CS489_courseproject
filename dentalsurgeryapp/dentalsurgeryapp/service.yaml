@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dentalsurgeryapp-service
+  name: k8swf
+  namespace: k8snamespace
   labels:
-    app: dentalsurgeryapp
+    app.kubernetes.io/name: k8swf
+    kubernetes.azure.com/generator: draft
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
-    app: dentalsurgeryapp
+    app.kubernetes.io/name: k8swf
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
       targetPort: 8083
-      protocol: TCP
-      name: http

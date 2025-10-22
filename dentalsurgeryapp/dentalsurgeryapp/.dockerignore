@@ -22,3 +22,9 @@ Thumbs.db
 # Local environment / config
 env/
 credentials/
+
+Dockerfile
+charts/
+target/
+work/
+.git/
