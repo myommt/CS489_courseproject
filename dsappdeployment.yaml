@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dentalsurgeryapp-deployment
+  labels:
+    app: dentalsurgeryapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dentalsurgeryapp
+  template:
+    metadata:
+      labels:
+        app: dentalsurgeryapp
+    spec:
+      containers:
+        - name: dentalsurgeryapp
+          image: dsappacrname.azurecr.io/dentalsurgeryapp:v1
+          ports:
+            - containerPort: 8083
+          env:
+            - name: PORT
+              value: "8083"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dentalsurgeryapp-service
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 20.80.144.203 # your Azure public IP
+  selector:
+    app: dentalsurgeryapp
+  ports:
+    - protocol: TCP
+      port: 80 # external port
+      targetPort: 8083 # container port

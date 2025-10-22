@@ -1,0 +1,52 @@
+1. Create docker image
+docker build -t dentalsurgeryapp:v1 .
+
+2. Create docker container
+docker run -d -p 8083:8083 --name dentalsurgeryapp-container dentalsurgeryapp:v1
+
+3. Create AZ resource group
+az group create --name dsappResourceGroup --location westus2
+
+4. Create Azure Container Registry (ACR)
+az acr create --resource-group dsappResourceGroup --name dsappacrname --sku Basic
+
+5. Verify ACR in Resource Group
+az acr list --resource-group dsappResourceGroup -o table
+
+6. Login ACR
+az acr login --name dsappacrname
+ 
+7. Tag ACR and docker
+docker tag dentalsurgeryapp:v1 dsappacrname.azurecr.io/dentalsurgeryapp:v1
+
+8. Push Docker to ACR
+docker push dsappacrname.azurecr.io/dentalsurgeryapp:v1
+
+9. Verify ACR
+az acr repository list --name dsappacrname
+
+10. Create AKS
+az aks create `
+  --resource-group dsappResourceGroup `
+  --name dsappAKSCluster `
+  --node-count 1 `
+  --node-vm-size Standard_B2ms `
+  --attach-acr dsappacrname `
+  --generate-ssh-keys
+ 
+
+
+11. Get credentials for kubectl
+az aks get-credentials --resource-group dsappResourceGroup --name dsappAKSCluster
+
+
+12. Deploy to AKS
+kubectl apply -f dsappdeployment.yaml
+
+13. Check pods are running
+kubectl get pods -w
+
+
+14. kubectl get svc dentalsurgeryapp-service
+
+

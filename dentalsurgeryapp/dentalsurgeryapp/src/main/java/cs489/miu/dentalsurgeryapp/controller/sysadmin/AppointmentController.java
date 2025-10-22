@@ -470,7 +470,7 @@ public class AppointmentController {
         } catch (AppointmentLimitExceededException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponseDTO("Appointment Limit Exceeded", e.getMessage()));
-        } catch (Exception _) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponseDTO("Bad Request", "Invalid appointment data provided"));
         }
@@ -499,7 +499,7 @@ public class AppointmentController {
         } catch (AppointmentLimitExceededException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorResponseDTO("Appointment Limit Exceeded", e.getMessage()));
-        } catch (Exception _) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponseDTO("Bad Request", "Invalid appointment data or appointment not found"));
         }

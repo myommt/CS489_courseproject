@@ -1,0 +1,44 @@
+az group create `
+  --name dentalsurgeryapp2 `
+  --location westus2
+
+
+
+az provider register --namespace Microsoft.OperationalInsights
+
+az provider show --namespace Microsoft.OperationalInsights --query "registrationState"
+
+az provider register --namespace microsoft.insights
+
+az provider show --namespace microsoft.insights --query "registrationState"
+
+az aks create `
+  --resource-group dentalsurgeryapp2 `
+  --name dentalsurgeryappk8s2 `
+  --node-count 1 `
+  --enable-addons monitoring `
+  --generate-ssh-keys `
+  --node-vm-size Standard_A2_v2 `
+  --nodepool-name mynodepool
+
+
+az provider register --namespace Microsoft.ContainerRegistry
+
+ az acr create --resource-group dentalsurgeryapp2 --name dentalsurgeryapp2acrname --sku Basic
+
+
+
+az aks get-credentials --resource-group dentalsurgeryapp2 --name dentalsurgeryappk8s2 --overwrite-existing
+
+
+az ad sp create-for-rbac --name "github-deployer" --role contributor `
+  --scopes /subscriptions/76d6540f-bd83-413f-9156-9c5ac8725146/resourceGroups/dentalsurgeryapp2 `
+  --sdk-auth
+
+
+& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" `
+  -h dentalsurgerydb.mysql.database.azure.com `
+  -u myoAdmin1@dentalsurgerydb `
+  --ssl-ca="C:\cert\DigiCertGlobalRootG2.crt.pem" `
+  -pAbcde12345! `
+  -e "SHOW DATABASES;"
