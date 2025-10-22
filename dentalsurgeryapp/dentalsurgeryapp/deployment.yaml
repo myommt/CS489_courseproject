@@ -16,28 +16,28 @@ spec:
     spec:
       containers:
         - name: dentalsurgeryapp
-          image: dentalsurgeryapp:latest
+          image: myommt/dentalsurgeryapp2-aks:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 8083
           resources:
             requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
               cpu: "250m"
               memory: "256Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 8083
             initialDelaySeconds: 30
             periodSeconds: 20
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
-              port: 8080
+              port: 8083
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 3

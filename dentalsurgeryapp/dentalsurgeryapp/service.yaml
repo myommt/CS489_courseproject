@@ -10,6 +10,6 @@ spec:
     app: dentalsurgeryapp
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 8083
       protocol: TCP
       name: http
