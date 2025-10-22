@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: dentalsurgery-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: apsd489
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Abcde12345!
+      MYSQL_ROOT_PASSWORD: Abcde12345!
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dentalsurgeryapp:local
+    container_name: dentalsurgery-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/apsd489
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Abcde12345!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8083:8080"
+    restart: on-failure
+
+volumes:
+  db_data:
+# Notes:
+# - If you prefer the app to connect using `SPRING_DATASOURCE_URL` env var, the app must be configured to read it (Spring Boot reads SPRING_DATASOURCE_URL by default).
+# - In Compose the app uses the hostname 'db' to reach the MySQL container.

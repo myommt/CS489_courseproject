@@ -1,0 +1,24 @@
+# Ignore build artifacts and IDE files
+target/
+*.log
+*.tmp
+
+# Git
+.git
+.gitignore
+
+# Maven wrapper cache
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment / config
+env/
+credentials/
