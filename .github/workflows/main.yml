@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build JAR
-        working-directory: ./CS489_courseproject/dentalsurgeryapp/dentalsurgeryapp
+        working-directory: ./dentalsurgeryapp/dentalsurgeryapp
         run: mvn clean package -DskipTests
 
       - name: Log in to Azure using personal credentials
