@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dentalsurgery-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dentalsurgery-app
+  template:
+    metadata:
+      labels:
+        app: dentalsurgery-app
+    spec:
+      containers:
+        - name: dentalsurgery-app
+          image: dsappcicdacrname.azurecr.io/dentalsurgery-app:latest
+          ports:
+            - containerPort: 8080
